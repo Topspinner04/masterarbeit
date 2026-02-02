@@ -1,7 +1,7 @@
 from pydantic_ai import Agent
 from dotenv import load_dotenv
-from utils import load_prompt
-from prompts.what2eat.build_prompt import build_prompt
+from utils.utils import load_prompt
+
 import logfire
 
 load_dotenv()
@@ -10,12 +10,7 @@ logfire.configure()
 logfire.instrument_pydantic_ai()
 
 system_prompt = load_prompt("prompts/system.md")
-prompt = build_prompt(
-    [
-        "prompts/system.md",
-        "prompts/what2eat/task.md",
-    ]
-)
+prompt = load_prompt("prompts/what2eat/prompt.md")
 
 agent = Agent(
     "google-gla:gemini-2.5-pro",

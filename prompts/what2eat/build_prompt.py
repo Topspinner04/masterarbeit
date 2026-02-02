@@ -1,13 +1,9 @@
-from utils import load_prompt
+from utils.utils import build_prompt_from_parts
 
-system_prompt = load_prompt("prompts/system.md")
-task_prompt = load_prompt("prompts/what2eat/task.md")
-
-
-def build_prompt(prompt_paths):
-    """Combine prompt parts into single prompt."""
-    combined_prompt = []
-    for path in prompt_paths:
-        combined_prompt.append(load_prompt(path))
-
-    return "\n".join(combined_prompt)
+build_prompt_from_parts(
+    prompt_paths=[
+        "prompts/what2eat/task.md",
+        "prompts/what2eat/context.md",
+    ],
+    output_file="prompts/what2eat/prompt.md",
+)
