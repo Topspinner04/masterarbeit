@@ -1,37 +1,23 @@
 from pathlib import Path
 
 
-def load_prompt(filepath):
+def load_prompt(file_path):
     """Loads a prompt from a markdown file."""
-    prompt = Path(filepath).read_text()
+    prompt = Path(file_path).read_text()
     return prompt
 
 
-# TODO: Add functionality to ignore unneccessary files
-def collect_code_to_context(folder_path, output_file):
-    """Collect all relevant files from a project into a single markdown file."""
-    folder = Path(folder_path)
+def collect_code_to_context(project_path: str, output_file: str):
+    root = Path(project_path)
 
     with open(output_file, "w") as out:
-        out.write(f"# Code files from {folder_path}\n\n")
+        out.write(f"# Python files - {root}\n\n")
 
-        for file_path in folder.rglob("*"):
-            if file_path.is_dir():
-                continue
+        for path in sorted(root.rglob("*.py")):
+            out.write(f"## `{path.relative_to(root)}`\n\n")
+            out.write(f"```python\n{path.read_text()}\n```\n\n")
 
-            rel_path = file_path.relative_to(folder)
-            try:
-                with open(file_path, "r") as f:
-                    content = f.read()
-            except Exception as e:
-                content = f"Could not read file: {e}"
-
-            lang = file_path.suffix.lstrip(".")
-
-            out.write(f"## {file_path}\n\n")
-            out.write(f"**Path:** {rel_path}\n\n")
-            out.write(f"```{lang}\n{content}\n```\n\n")
-            out.write("---\n\n")
+    print(f"Done → {output_file}")
 
 
 def build_prompt_from_context(context_paths, output_file):
@@ -42,3 +28,5 @@ def build_prompt_from_context(context_paths, output_file):
 
     with open(output_file, "w") as out:
         out.write("\n".join(combined_prompt))
+
+    print(f"Done → {output_file}")

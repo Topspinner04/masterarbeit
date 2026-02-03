@@ -18,7 +18,7 @@ prompt_path = f"prompts/{project}"
 
 # Collects code files from ref to code context markdown file
 code_context = collect_code_to_context(
-    folder_path=ref_path,
+    project_path=ref_path,
     output_file=f"{context_path}/code_context.md",
 )
 
