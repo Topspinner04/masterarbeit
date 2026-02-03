@@ -7,8 +7,9 @@ def load_prompt(filepath):
     return prompt
 
 
-def collect_code_to_markdown(folder_path, output_file):
-    """Collect all code files from a folder into a single markdown file."""
+# TODO: Add functionality to ignore unneccessary files
+def collect_code_to_context(folder_path, output_file):
+    """Collect all relevant files from a project into a single markdown file."""
     folder = Path(folder_path)
 
     with open(output_file, "w") as out:
@@ -33,10 +34,10 @@ def collect_code_to_markdown(folder_path, output_file):
             out.write("---\n\n")
 
 
-def build_prompt_from_parts(prompt_paths, output_file):
+def build_prompt_from_context(context_paths, output_file):
     """Combine prompt parts into single prompt."""
     combined_prompt = []
-    for path in prompt_paths:
+    for path in context_paths:
         combined_prompt.append(load_prompt(path))
 
     with open(output_file, "w") as out:
