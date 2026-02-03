@@ -1,5 +1,26 @@
+# Virtual environment
 .venv/
+venv/
+
+# Environment variables
 .env
+.env.local
+
+# Python cache
 __pycache__/
-/masterarbeit.egg-info/
-__init__.py
+*.py[cod]
+*$py.class
+
+# Egg info
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
