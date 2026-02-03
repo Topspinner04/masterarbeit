@@ -1,47 +1,4 @@
-# What2Eat - Architecture documentation <!-- omit in toc -->
-
-Based on version 2.0.0 of the [ADF documentation template](https://github.com/architecture-decomposition-framework/adf-documentation-template).
-
-## Table of contents <!-- omit in toc -->
-
-- [1. Introduction](#1-introduction)
-  - [1.1. Business context](#11-business-context)
-  - [1.2. System overview](#12-system-overview)
-  - [1.3. Stakeholders](#13-stakeholders)
-  - [1.4. Constraints](#14-constraints)
-  - [1.5. Document goals](#15-document-goals)
-- [2. System context and domain](#2-system-context-and-domain)
-  - [2.1. System context delineation](#21-system-context-delineation)
-  - [2.2. Domain model](#22-domain-model)
-- [3. Architecture drivers (function and quality)](#3-architecture-drivers-function-and-quality)
-  - [3.1. Key functional requirements](#31-key-functional-requirements)
-  - [3.2. Quality attributes](#32-quality-attributes)
-- [4. System decomposition](#4-system-decomposition)
-  - [4.1. Solution approach and key architecture decisions](#41-solution-approach-and-key-architecture-decisions)
-  - [4.2. System structure](#42-system-structure)
-  - [4.3. Data model](#43-data-model)
-  - [4.4. Code organization (mapping runtime to devtime)](#44-code-organization-mapping-runtime-to-devtime)
-  - [4.5. Build Process](#45-build-process)
-  - [4.6. Deployment and Operation](#46-deployment-and-operation)
-  - [4.7. Technologies](#47-technologies)
-    - [4.7.1. Architecture drivers](#471-architecture-drivers)
-    - [4.7.2. Solution idea](#472-solution-idea)
-    - [4.7.3. Design decisions](#473-design-decisions)
-    - [4.7.4. Discarded alternatives](#474-discarded-alternatives)
-- [5. Quality concepts](#5-quality-concepts)
-  - [5.1. Testability concept](#51-testability-concept)
-    - [5.1.1. Architecture drivers](#511-architecture-drivers)
-    - [5.1.2. Solution Idea](#512-solution-idea)
-    - [5.1.3. Design decisions](#513-design-decisions)
-    - [5.1.4. Discarded alternatives](#514-discarded-alternatives)
-  - [5.2. Caching concept](#52-caching-concept)
-    - [5.2.1. Architecture drivers](#521-architecture-drivers)
-    - [5.2.2. Solution idea](#522-solution-idea)
-    - [5.2.3. Design decisions](#523-design-decisions)
-    - [5.2.4. Discarded alternatives](#524-discarded-alternatives)
-- [6. Risks and technical debt](#6-risks-and-technical-debt)
-- [7. Outlook and future plans](#7-outlook-and-future-plans)
-- [8. Glossary](#8-glossary)
+# What2Eat - Architecture documentation
 
 ## 1. Introduction
 
@@ -133,28 +90,10 @@ F3. As a hungry student, I would like to know if there will be a cold bowl (see 
 
 Quality attributes are described in form of the architecture scenario template. Status and Priority are omitted.
 
-> Technical note: The scenarios are given as Markdown tables which is a widely supported Markdown extension. However, they can also be specified with plain text and bullet points, which makes them easier to read and edit in the raw Markdown format. An example is given here:
-
-#### 3.2.1. Development start time (Q.EasyDevStart) <!-- omit in toc -->
-
-- Environment: A developer has a computer with working internet connection and
-  standard WIN dev environment: Java version J is installed, IntelliJ version I,
-  git version G and Maven version M installed.
-  - Internet bandwidth &ge; 1 MBit/s, J &ge; 17, I &ge; 2021.3, G &ge; 2.33, M
-    &ge; 3.8
-- Stimulus: The developer wants to checkout and run the project for local
-  testing.
-- Response: The system is running and answering the first request in T
-  - T &le; 5 minutes
-
-| Categorization  |                                                                                                                                                                                                                                                              |                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |-------------------------------------------------------------------------------------|
-| Scenario Name   | Development start time                                                                                                                                                                                                                                        | |
-| Scenario ID     | Q.EasyDevStart                                                                                                                                                                                                                                               | |
-| **Description** |                                                                                                                                                                                                                                                              | **Quantification**                                                                  |
-| Environment     | A developer has a computer with working internet connection and standard WIN dev environment: Java version J is installed, IntelliJ version I, git version G and Maven version M installed. | Internet bandwidth &ge; 1 MBit/s, J &ge; 17, I &ge; 2021.3, G &ge; 2.33, M &ge; 3.8 |
-| Stimulus        | The developer wants to checkout and run the project for local testing.                                                                                                                                                                                       | |
-| Response        | The system is running and answering the first request in T.                                                                                                                                                                                                  | T &le; 5 minutes                                                                    |
+**Description** | | **Quantification** |
+| Environment | A developer has a computer with working internet connection and standard WIN dev environment: Java version J is installed, IntelliJ version I, git version G and Maven version M installed. | Internet bandwidth &ge; 1 MBit/s, J &ge; 17, I &ge; 2021.3, G &ge; 2.33, M &ge; 3.8 |
+| Stimulus | The developer wants to checkout and run the project for local testing. | |
+| Response | The system is running and answering the first request in T. | T &le; 5 minutes |
 
 | Categorization  |                                                                                |                    |
 | --------------- | ------------------------------------------------------------------------------ | ------------------ |
@@ -168,7 +107,7 @@ Quality attributes are described in form of the architecture scenario template. 
 | Categorization  |                                                                                                                |                    |
 | --------------- | -------------------------------------------------------------------------------------------------------------- | ------------------ |
 | Scenario Name   | Package Size                                                                                                   |                    |
-| Scenario ID     | Q.Size                                                                                                         | |
+| Scenario ID     | Q.Size                                                                                                         |                    |
 | **Description** |                                                                                                                | **Quantification** |
 | Environment     | The code is ready for a new deployment.                                                                        |                    |
 | Stimulus        | A new deployment artifact is built to update the production app.                                               |                    |
@@ -177,7 +116,7 @@ Quality attributes are described in form of the architecture scenario template. 
 | Categorization  |                                                                     |                                                                                                                                                                                                                                                                                                                   |
 | --------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Scenario Name   | Simple one-user educational system                                  |                                                                                                                                                                                                                                                                                                                   |
-| Scenario ID     | Q.Performance.Threads                                               | |
+| Scenario ID     | Q.Performance.Threads                                               |                                                                                                                                                                                                                                                                                                                   |
 | **Description** |                                                                     | **Quantification**                                                                                                                                                                                                                                                                                                |
 | Environment     | The system is running.                                              |                                                                                                                                                                                                                                                                                                                   |
 | Stimulus        | The system gets x parallel requests                                 | x = 1 (_simple educational system, no parallelism required!_)                                                                                                                                                                                                                                                     |
@@ -186,7 +125,7 @@ Quality attributes are described in form of the architecture scenario template. 
 | Categorization  |                                                                                  |                                                  |
 | --------------- | -------------------------------------------------------------------------------- | ------------------------------------------------ |
 | Scenario Name   | (Almost) instant meal display                                                    |                                                  |
-| Scenario ID     | Q.Performance.Response                                                           | |
+| Scenario ID     | Q.Performance.Response                                                           |                                                  |
 | **Description** |                                                                                  | **Quantification**                               |
 | Environment     | The system is running. The cafeteria is open on the current day.                 |                                                  |
 | Stimulus        | A user requests the meal(s) of today.                                            |                                                  |
@@ -195,7 +134,7 @@ Quality attributes are described in form of the architecture scenario template. 
 | Categorization  |                                                                                                                                                                                     |                                    |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
 | Scenario Name   | Offline testability                                                                                                                                                                 |                                    |
-| Scenario ID     | Q.Testability.Offline                                                                                                                                                               | |
+| Scenario ID     | Q.Testability.Offline                                                                                                                                                               |                                    |
 | **Description** |                                                                                                                                                                                     | **Quantification**                 |
 | Environment     | A developer has set up the project for local development and testing. There is internet connection on the computer. The developer executes all unit and module tests. x tests pass. | x = number of passed tests         |
 | Stimulus        | The developer goes offline and executes unit and module tests again.                                                                                                                | Internet bandwidth = 0 Mbit/s      |
@@ -204,7 +143,7 @@ Quality attributes are described in form of the architecture scenario template. 
 | Categorization  |                                                                                                       |                                                                    |
 | --------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | Scenario Name   | Weather testability                                                                                   |                                                                    |
-| Scenario ID     | Q.Testability.Weather                                                                                 | |
+| Scenario ID     | Q.Testability.Weather                                                                                 |                                                                    |
 | **Description** |                                                                                                       | **Quantification**                                                 |
 | Environment     | A developer has set up the project for local development and testing. It is winter in Kaiserslautern. | temperature in Kaiserslautern < 20°C                               |
 | Stimulus        | The developer wants to test for different cold bowl probability values.                               | cold bowl probability values 0%, 1%, 21%, 45%, 50%, 78%, 99%, 100% |
@@ -264,7 +203,7 @@ Discarded Alternatives:
 
 To build a releasable and deployable JAR file, the Maven package command can be used. However, currently, the system is built and run within IntelliJ IDE only and used for local testing and demonstration.
 
-### 4.6. Deployment and Operation  
+### 4.6. Deployment and Operation
 
 The system is decomposed into a client and a server part. These correspond to the Meal display and meal data acquisition components. During development, both client and server can be run on the same machine:
 
@@ -319,7 +258,7 @@ _Q.Testability.Offline_, _Q.Testability.Weather_
 
 #### 5.1.2. Solution Idea
 
-We need a mechanism that makes it easy to exchange the real weather and menu service with services that are adequate for offline testing and for using fake weather data. For the  system with the real service, a service factory facilitates the service instantiation.
+We need a mechanism that makes it easy to exchange the real weather and menu service with services that are adequate for offline testing and for using fake weather data. For the system with the real service, a service factory facilitates the service instantiation.
 
 The following figure illustrates these two concepts:
 
@@ -343,7 +282,7 @@ Main driver: _Q.Performance.Response_, i.e. a response time of &le; 200ms.
 
 Related drivers: _Q.Size_ and _Q.Comprehensibility_.
 
-#### 5.2.2. Solution idea  
+#### 5.2.2. Solution idea
 
 We introduce an in-memory cache such that meals and weather data is only queried every 30 minutes.
 

@@ -11,16 +11,16 @@ def collect_code_to_context(project_path: str, output_file: str):
     root = Path(project_path)
 
     with open(output_file, "w") as out:
-        out.write(f"# Python files - {root}\n\n")
+        out.write(f"# Java files - {root}\n\n")
 
-        for path in sorted(root.rglob("*.py")):
+        for path in sorted(root.rglob("*.java")):
             out.write(f"## `{path.relative_to(root)}`\n\n")
-            out.write(f"```python\n{path.read_text()}\n```\n\n")
+            out.write(f"```java\n{path.read_text()}\n```\n\n")
 
     print(f"Done → {output_file}")
 
 
-def build_prompt_from_context(context_paths, output_file):
+def build_prompt(context_paths, output_file):
     """Combine prompt parts into single prompt."""
     combined_prompt = []
     for path in context_paths:

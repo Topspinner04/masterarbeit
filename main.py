@@ -1,7 +1,7 @@
 import logfire
 from pydantic_ai import Agent
 from dotenv import load_dotenv
-from utils.utils import build_prompt_from_context, collect_code_to_context, load_prompt
+from utils.utils import build_prompt, collect_code_to_context, load_prompt
 
 # Load environment variables from .env file
 load_dotenv()
@@ -23,7 +23,7 @@ code_context = collect_code_to_context(
 )
 
 # Build context prompt from code context and architecture documentation
-build_prompt_from_context(
+build_prompt(
     context_paths=[
         f"{context_path}/code_context.md",
         f"{context_path}/architecture_documentation.md",
@@ -32,16 +32,16 @@ build_prompt_from_context(
 )
 
 # Build user prompt from task and context prompt
-build_prompt_from_context(
+build_prompt(
     context_paths=[
-        f"{context_path}/task.md",
-        f"{context_path}/context.md",
+        f"{prompt_path}/task.md",
+        f"{prompt_path}/context.md",
     ],
     output_file=f"{prompt_path}/user.md",
 )
 
 # Load system prompt
-system_prompt = load_prompt(f"{prompt_path}/system.md")
+system_prompt = load_prompt("prompts/system.md")
 
 # Load user prompt
 user_prompt = load_prompt(f"{prompt_path}/user.md")

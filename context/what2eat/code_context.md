@@ -1,55 +1,8 @@
-# Code files from prompts/what2eat/context-code/what2eat/src
+# Java files - ref/what2eat
 
-## prompts/what2eat/context-code/what2eat/src/misc/meal.http
+## `src/main/java/de/schneider21/what2eat/Application.java`
 
-**Path:** misc/meal.http
-
-```http
-GET http://localhost:8080/meal
-
-###
-
-GET http://localhost:8080/meal/2021-11-09
-
-###
-```
-
----
-
-## prompts/what2eat/context-code/what2eat/src/misc/weather-api.http
-
-**Path:** misc/weather-api.http
-
-```http
-GET https://api.met.no/weatherapi/locationforecast/1.9/?lat=60.10&lon=9.58
-Accept: application/json
-
-###
-
-GET https://api.weatherbit.io/v2.0/forecast/daily?city=Kaiserslautern&country=DE&key=TODO
-Accept: application/json
-
-###
-```
-
----
-
-## prompts/what2eat/context-code/what2eat/src/main/resources/weatherbit.sample.properties
-
-**Path:** main/resources/weatherbit.sample.properties
-
-```properties
-# Copy this file to weatherbit.properties and set API key
-apiKey=put the key here!
-```
-
----
-
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/Application.java
-
-**Path:** main/java/de/schneider21/what2eat/Application.java
-
-```java
+```python
 package de.schneider21.what2eat;
 
 import de.schneider21.what2eat.framework.HttpServer;
@@ -70,13 +23,9 @@ public class Application {
 
 ```
 
----
+## `src/main/java/de/schneider21/what2eat/ServiceFactory.java`
 
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/ServiceFactory.java
-
-**Path:** main/java/de/schneider21/what2eat/ServiceFactory.java
-
-```java
+```python
 package de.schneider21.what2eat;
 
 import de.schneider21.what2eat.meal.business.*;
@@ -127,13 +76,9 @@ public class ServiceFactory {
 
 ```
 
----
+## `src/main/java/de/schneider21/what2eat/framework/HttpServer.java`
 
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/framework/HttpServer.java
-
-**Path:** main/java/de/schneider21/what2eat/framework/HttpServer.java
-
-```java
+```python
 package de.schneider21.what2eat.framework;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -206,13 +151,9 @@ public class HttpServer extends NanoHTTPD {
 
 ```
 
----
+## `src/main/java/de/schneider21/what2eat/framework/RestController.java`
 
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/framework/RestController.java
-
-**Path:** main/java/de/schneider21/what2eat/framework/RestController.java
-
-```java
+```python
 package de.schneider21.what2eat.framework;
 
 import java.util.HashMap;
@@ -246,13 +187,71 @@ public abstract class RestController {
 
 ```
 
----
+## `src/main/java/de/schneider21/what2eat/meal/api/MealController.java`
 
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/meal/business/IMenuService.java
+```python
+package de.schneider21.what2eat.meal.api;
 
-**Path:** main/java/de/schneider21/what2eat/meal/business/IMenuService.java
+import de.schneider21.what2eat.ServiceFactory;
+import de.schneider21.what2eat.framework.RestController;
+import de.schneider21.what2eat.meal.business.IMealService;
+import de.schneider21.what2eat.meal.data.BasicMeal;
+import de.schneider21.what2eat.meal.data.ExtendedMeal;
 
-```java
+import java.util.List;
+
+public class MealController extends RestController {
+
+    public MealController() {
+        super();
+        addHttpGetMapping("/meal", this::getMeals);
+        addHttpGetMapping("/meal/.*", this::getMeal);
+    }
+
+    public List<BasicMeal> getMeals(IRequestParameters parameters) {
+        final IMealService mealService = ServiceFactory.getInstance().getMealService();
+        final List<BasicMeal> meals = mealService.getAllAvailableMeals();
+
+        return meals;
+    }
+
+    public ExtendedMeal getMeal(IRequestParameters parameters) {
+        final String dateFromPath = parameters.getPath().substring("/meal/".length());
+
+        final IMealService mealService = ServiceFactory.getInstance().getMealService();
+        final ExtendedMeal meal = mealService.getExtendedMealForDate(dateFromPath);
+
+        return meal;
+    }
+
+}
+
+```
+
+## `src/main/java/de/schneider21/what2eat/meal/business/IMealService.java`
+
+```python
+package de.schneider21.what2eat.meal.business;
+
+import de.schneider21.what2eat.meal.data.BasicMeal;
+import de.schneider21.what2eat.meal.data.ExtendedMeal;
+
+import java.util.List;
+
+public interface IMealService {
+
+    List<BasicMeal> getAllAvailableMeals();
+
+    ExtendedMeal getExtendedMealForDate(String dateString);
+
+    int calculateColdBowlProbabilityInPercent(Double temperature);
+}
+
+```
+
+## `src/main/java/de/schneider21/what2eat/meal/business/IMenuService.java`
+
+```python
 package de.schneider21.what2eat.meal.business;
 
 import de.schneider21.what2eat.meal.data.BasicMeal;
@@ -268,13 +267,78 @@ public interface IMenuService {
 
 ```
 
----
+## `src/main/java/de/schneider21/what2eat/meal/business/IWeatherService.java`
 
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/meal/business/MensaKlService.java
+```python
+package de.schneider21.what2eat.meal.business;
 
-**Path:** main/java/de/schneider21/what2eat/meal/business/MensaKlService.java
+public interface IWeatherService {
 
-```java
+    Double getTemperatureInCelsius(String cityName, String countryCode, String dateString);
+}
+
+```
+
+## `src/main/java/de/schneider21/what2eat/meal/business/MealService.java`
+
+```python
+package de.schneider21.what2eat.meal.business;
+
+import de.schneider21.what2eat.meal.data.BasicMeal;
+import de.schneider21.what2eat.meal.data.ExtendedMeal;
+
+import java.util.List;
+import java.util.Objects;
+
+public class MealService implements IMealService {
+
+    private IMenuService menuService;
+    private IWeatherService weatherService;
+
+    public MealService(IMenuService menuService, IWeatherService weatherService) {
+        Objects.requireNonNull(menuService);
+        this.menuService = menuService;
+        Objects.requireNonNull(weatherService);
+        this.weatherService = weatherService;
+    }
+
+    @Override
+    public List<BasicMeal> getAllAvailableMeals() {
+        return menuService.getAllAvailableMeals();
+    }
+
+    @Override
+    public ExtendedMeal getExtendedMealForDate(String dateString) {
+        final BasicMeal meal = menuService.getMealForDate(dateString);
+        if (meal == null) {
+            return null;
+        }
+        final Double temperatureInCelsius = weatherService.getTemperatureInCelsius("Kaiserslautern", "DE", dateString);
+        if (temperatureInCelsius != null) {
+            System.out.printf("MealService: Temperature received is %.2f°C\n", temperatureInCelsius);
+        } else {
+            System.out.printf("MealService: No temperature value could be found\n");
+        }
+        int coldBowlProbabilityInPercent = calculateColdBowlProbabilityInPercent(temperatureInCelsius);
+        ExtendedMeal extendedMeal = new ExtendedMeal(meal.getDate(), meal.getTitle(), meal.getPrice(),
+                coldBowlProbabilityInPercent);
+        return extendedMeal;
+    }
+
+    @Override
+    public int calculateColdBowlProbabilityInPercent(Double temperature) {
+        if (temperature == null) {
+            return -1;
+        }
+        return Math.toIntExact(Math.round(Math.max(0, Math.min(100, (temperature - 20) * 10))));
+    }
+}
+
+```
+
+## `src/main/java/de/schneider21/what2eat/meal/business/MensaKlService.java`
+
+```python
 package de.schneider21.what2eat.meal.business;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -441,13 +505,9 @@ public class MensaKlService implements IMenuService {
 
 ```
 
----
+## `src/main/java/de/schneider21/what2eat/meal/business/WeatherBitService.java`
 
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/meal/business/WeatherBitService.java
-
-**Path:** main/java/de/schneider21/what2eat/meal/business/WeatherBitService.java
-
-```java
+```python
 package de.schneider21.what2eat.meal.business;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -592,160 +652,9 @@ public class WeatherBitService implements IWeatherService {
 
 ```
 
----
+## `src/main/java/de/schneider21/what2eat/meal/data/BasicMeal.java`
 
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/meal/business/MealService.java
-
-**Path:** main/java/de/schneider21/what2eat/meal/business/MealService.java
-
-```java
-package de.schneider21.what2eat.meal.business;
-
-import de.schneider21.what2eat.meal.data.BasicMeal;
-import de.schneider21.what2eat.meal.data.ExtendedMeal;
-
-import java.util.List;
-import java.util.Objects;
-
-public class MealService implements IMealService {
-
-    private IMenuService menuService;
-    private IWeatherService weatherService;
-
-    public MealService(IMenuService menuService, IWeatherService weatherService) {
-        Objects.requireNonNull(menuService);
-        this.menuService = menuService;
-        Objects.requireNonNull(weatherService);
-        this.weatherService = weatherService;
-    }
-
-    @Override
-    public List<BasicMeal> getAllAvailableMeals() {
-        return menuService.getAllAvailableMeals();
-    }
-
-    @Override
-    public ExtendedMeal getExtendedMealForDate(String dateString) {
-        final BasicMeal meal = menuService.getMealForDate(dateString);
-        if (meal == null) {
-            return null;
-        }
-        final Double temperatureInCelsius = weatherService.getTemperatureInCelsius("Kaiserslautern", "DE", dateString);
-        if (temperatureInCelsius != null) {
-            System.out.printf("MealService: Temperature received is %.2f°C\n", temperatureInCelsius);
-        } else {
-            System.out.printf("MealService: No temperature value could be found\n");
-        }
-        int coldBowlProbabilityInPercent = calculateColdBowlProbabilityInPercent(temperatureInCelsius);
-        ExtendedMeal extendedMeal = new ExtendedMeal(meal.getDate(), meal.getTitle(), meal.getPrice(),
-                coldBowlProbabilityInPercent);
-        return extendedMeal;
-    }
-
-    @Override
-    public int calculateColdBowlProbabilityInPercent(Double temperature) {
-        if (temperature == null) {
-            return -1;
-        }
-        return Math.toIntExact(Math.round(Math.max(0, Math.min(100, (temperature - 20) * 10))));
-    }
-}
-
-```
-
----
-
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/meal/business/IWeatherService.java
-
-**Path:** main/java/de/schneider21/what2eat/meal/business/IWeatherService.java
-
-```java
-package de.schneider21.what2eat.meal.business;
-
-public interface IWeatherService {
-
-    Double getTemperatureInCelsius(String cityName, String countryCode, String dateString);
-}
-
-```
-
----
-
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/meal/business/IMealService.java
-
-**Path:** main/java/de/schneider21/what2eat/meal/business/IMealService.java
-
-```java
-package de.schneider21.what2eat.meal.business;
-
-import de.schneider21.what2eat.meal.data.BasicMeal;
-import de.schneider21.what2eat.meal.data.ExtendedMeal;
-
-import java.util.List;
-
-public interface IMealService {
-
-    List<BasicMeal> getAllAvailableMeals();
-
-    ExtendedMeal getExtendedMealForDate(String dateString);
-
-    int calculateColdBowlProbabilityInPercent(Double temperature);
-}
-
-```
-
----
-
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/meal/api/MealController.java
-
-**Path:** main/java/de/schneider21/what2eat/meal/api/MealController.java
-
-```java
-package de.schneider21.what2eat.meal.api;
-
-import de.schneider21.what2eat.ServiceFactory;
-import de.schneider21.what2eat.framework.RestController;
-import de.schneider21.what2eat.meal.business.IMealService;
-import de.schneider21.what2eat.meal.data.BasicMeal;
-import de.schneider21.what2eat.meal.data.ExtendedMeal;
-
-import java.util.List;
-
-public class MealController extends RestController {
-
-    public MealController() {
-        super();
-        addHttpGetMapping("/meal", this::getMeals);
-        addHttpGetMapping("/meal/.*", this::getMeal);
-    }
-
-    public List<BasicMeal> getMeals(IRequestParameters parameters) {
-        final IMealService mealService = ServiceFactory.getInstance().getMealService();
-        final List<BasicMeal> meals = mealService.getAllAvailableMeals();
-
-        return meals;
-    }
-
-    public ExtendedMeal getMeal(IRequestParameters parameters) {
-        final String dateFromPath = parameters.getPath().substring("/meal/".length());
-
-        final IMealService mealService = ServiceFactory.getInstance().getMealService();
-        final ExtendedMeal meal = mealService.getExtendedMealForDate(dateFromPath);
-
-        return meal;
-    }
-
-}
-
-```
-
----
-
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/meal/data/BasicMeal.java
-
-**Path:** main/java/de/schneider21/what2eat/meal/data/BasicMeal.java
-
-```java
+```python
 package de.schneider21.what2eat.meal.data;
 
 import java.math.BigDecimal;
@@ -799,13 +708,9 @@ public class BasicMeal {
 
 ```
 
----
+## `src/main/java/de/schneider21/what2eat/meal/data/ExtendedMeal.java`
 
-## prompts/what2eat/context-code/what2eat/src/main/java/de/schneider21/what2eat/meal/data/ExtendedMeal.java
-
-**Path:** main/java/de/schneider21/what2eat/meal/data/ExtendedMeal.java
-
-```java
+```python
 package de.schneider21.what2eat.meal.data;
 
 import java.math.BigDecimal;
@@ -846,13 +751,9 @@ public class ExtendedMeal extends BasicMeal {
 
 ```
 
----
+## `src/test/java/UmlPrinter.java`
 
-## prompts/what2eat/context-code/what2eat/src/test/java/UmlPrinter.java
-
-**Path:** test/java/UmlPrinter.java
-
-```java
+```python
 import de.schneider21.what2eat.ServiceFactory;
 import de.schneider21.what2eat.framework.HttpServer;
 import de.schneider21.what2eat.framework.RestController;
@@ -937,56 +838,85 @@ public class UmlPrinter {
 
 ```
 
----
+## `src/test/java/de/schneider21/what2eat/meal/business/ExampleData.java`
 
-## prompts/what2eat/context-code/what2eat/src/test/java/de/schneider21/what2eat/meal/business/MockMenuService.java
-
-**Path:** test/java/de/schneider21/what2eat/meal/business/MockMenuService.java
-
-```java
+```python
 package de.schneider21.what2eat.meal.business;
 
 import de.schneider21.what2eat.meal.data.BasicMeal;
 
-import java.util.Collections;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class MockMenuService implements IMenuService {
+public class ExampleData {
 
-    private List<BasicMeal> allMeals;
+    public static final List<BasicMeal> EXAMPLE_MEALS;
 
-    public MockMenuService(List<BasicMeal> allMeals) {
-        this.allMeals = allMeals;
-    }
+    static {
+        List<BasicMeal> meals = new ArrayList<>();
+        meals.add(new BasicMeal(new SimpleDateFormat("YYYY-MM-dd").format(new Date()),
+                "Tagesspezial: Schnitzel mit Pommes und Salat (SchniPoSa)",
+                new BigDecimal("2.65")));
+        meals.add(new BasicMeal("2020-03-23",
+                "Gebratene Hähnchenkeule  mit Mexikana-Salsa, Steakhouse-Fries und Weißkrautsalat \\\"Coleslaw\\\"",
+                new BigDecimal("2.65")));
+        meals.add(new BasicMeal("2020-03-24", "Maultaschen mit Fleischfüllung, Kartoffel-Käse-Soße  und Salat",
+                new BigDecimal("2.65")));
+        meals.add(new BasicMeal("2020-03-25", "Paniertes Schweineschnitzel  mit Rahmsoße, Spätzle  und Salat",
+                new BigDecimal("2.65")));
+        meals.add(new BasicMeal("2020-03-26", "Rindersaftgulasch  mit hausgemachtem Karotten-Kartoffelstampf und Salat",
+                new BigDecimal("2.65")));
+        meals.add(new BasicMeal("2020-03-27", "Indisches Fischcurry mit Seelachs und Gemüse, Duftreis und Salat",
+                new BigDecimal("2.65")));
 
-    public List<BasicMeal> findAllSortByDateAsc() {
-        return Collections.unmodifiableList(allMeals);
-    }
+        meals.add(new BasicMeal("2020-03-30", "Falafel mit \"Ras el Hanout\"-Soße, orientalischem Reis und Salat",
+                new BigDecimal("2.65")));
+        meals.add(
+                new BasicMeal("2020-03-31", "Geschmorte Lammkeule \"Provencial\" mit Burgundersoße und Pariser " +
+                        "Kartoffeln",
+                        new BigDecimal("2.65")));
+        meals.add(new BasicMeal("2020-04-01",
+                "\"Fajita Pueblo\" mit Paprika, Zucchini und Zwiebeln, dazu Sour-Cream-Dip, Tortillas und Salat",
+                new BigDecimal("2.65")));
+        meals.add(new BasicMeal("2020-04-02", "Hähnchenbrustfilet, Ratatouillegemüse, Thymiankartoffeln und Salat",
+                new BigDecimal("2.65")));
+        meals.add(new BasicMeal("2020-04-03", "'Dibbelabbes': Saarländischer Kartoffelauflauf mit Lauch, dazu Apfelmus",
+                new BigDecimal("2.65")));
 
-    @Override
-    public List<BasicMeal> getAllAvailableMeals() {
-        return allMeals;
-    }
-
-    @Override
-    public BasicMeal getMealForDate(String dateString) {
-        return allMeals
-                .stream()
-                .filter(m -> m.getDate().equals(dateString))
-                .findAny()
-                .orElse(null);
+        EXAMPLE_MEALS = meals;
     }
 }
 
 ```
 
----
+## `src/test/java/de/schneider21/what2eat/meal/business/IncreaseCoverageDummyTest.java`
 
-## prompts/what2eat/context-code/what2eat/src/test/java/de/schneider21/what2eat/meal/business/MealServiceSimpleMockTest.java
+```python
+package de.schneider21.what2eat.meal.business;
 
-**Path:** test/java/de/schneider21/what2eat/meal/business/MealServiceSimpleMockTest.java
+import org.junit.jupiter.api.Test;
 
-```java
+/**
+ * This is an example how one can increase test coverage drastically without any actual benefit since the test is
+ * useless (no assert used, and the weather service even logs an error!)
+ */
+public class IncreaseCoverageDummyTest {
+
+    @Test
+    public void test() {
+        new MensaKlService().getAllAvailableMeals();
+        new WeatherBitService().getTemperatureInCelsius(null, null, null);
+    }
+}
+
+```
+
+## `src/test/java/de/schneider21/what2eat/meal/business/MealServiceSimpleMockTest.java`
+
+```python
 package de.schneider21.what2eat.meal.business;
 
 import de.schneider21.what2eat.meal.data.BasicMeal;
@@ -1050,13 +980,9 @@ class MealServiceSimpleMockTest {
 }
 ```
 
----
+## `src/test/java/de/schneider21/what2eat/meal/business/MealServiceTest.java`
 
-## prompts/what2eat/context-code/what2eat/src/test/java/de/schneider21/what2eat/meal/business/MealServiceTest.java
-
-**Path:** test/java/de/schneider21/what2eat/meal/business/MealServiceTest.java
-
-```java
+```python
 package de.schneider21.what2eat.meal.business;
 
 import de.schneider21.what2eat.meal.data.BasicMeal;
@@ -1146,97 +1072,9 @@ class MealServiceTest {
 }
 ```
 
----
+## `src/test/java/de/schneider21/what2eat/meal/business/MensaKlServiceTest.java`
 
-## prompts/what2eat/context-code/what2eat/src/test/java/de/schneider21/what2eat/meal/business/ExampleData.java
-
-**Path:** test/java/de/schneider21/what2eat/meal/business/ExampleData.java
-
-```java
-package de.schneider21.what2eat.meal.business;
-
-import de.schneider21.what2eat.meal.data.BasicMeal;
-
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-public class ExampleData {
-
-    public static final List<BasicMeal> EXAMPLE_MEALS;
-
-    static {
-        List<BasicMeal> meals = new ArrayList<>();
-        meals.add(new BasicMeal(new SimpleDateFormat("YYYY-MM-dd").format(new Date()),
-                "Tagesspezial: Schnitzel mit Pommes und Salat (SchniPoSa)",
-                new BigDecimal("2.65")));
-        meals.add(new BasicMeal("2020-03-23",
-                "Gebratene Hähnchenkeule  mit Mexikana-Salsa, Steakhouse-Fries und Weißkrautsalat \\\"Coleslaw\\\"",
-                new BigDecimal("2.65")));
-        meals.add(new BasicMeal("2020-03-24", "Maultaschen mit Fleischfüllung, Kartoffel-Käse-Soße  und Salat",
-                new BigDecimal("2.65")));
-        meals.add(new BasicMeal("2020-03-25", "Paniertes Schweineschnitzel  mit Rahmsoße, Spätzle  und Salat",
-                new BigDecimal("2.65")));
-        meals.add(new BasicMeal("2020-03-26", "Rindersaftgulasch  mit hausgemachtem Karotten-Kartoffelstampf und Salat",
-                new BigDecimal("2.65")));
-        meals.add(new BasicMeal("2020-03-27", "Indisches Fischcurry mit Seelachs und Gemüse, Duftreis und Salat",
-                new BigDecimal("2.65")));
-
-        meals.add(new BasicMeal("2020-03-30", "Falafel mit \"Ras el Hanout\"-Soße, orientalischem Reis und Salat",
-                new BigDecimal("2.65")));
-        meals.add(
-                new BasicMeal("2020-03-31", "Geschmorte Lammkeule \"Provencial\" mit Burgundersoße und Pariser " +
-                        "Kartoffeln",
-                        new BigDecimal("2.65")));
-        meals.add(new BasicMeal("2020-04-01",
-                "\"Fajita Pueblo\" mit Paprika, Zucchini und Zwiebeln, dazu Sour-Cream-Dip, Tortillas und Salat",
-                new BigDecimal("2.65")));
-        meals.add(new BasicMeal("2020-04-02", "Hähnchenbrustfilet, Ratatouillegemüse, Thymiankartoffeln und Salat",
-                new BigDecimal("2.65")));
-        meals.add(new BasicMeal("2020-04-03", "'Dibbelabbes': Saarländischer Kartoffelauflauf mit Lauch, dazu Apfelmus",
-                new BigDecimal("2.65")));
-
-        EXAMPLE_MEALS = meals;
-    }
-}
-
-```
-
----
-
-## prompts/what2eat/context-code/what2eat/src/test/java/de/schneider21/what2eat/meal/business/IncreaseCoverageDummyTest.java
-
-**Path:** test/java/de/schneider21/what2eat/meal/business/IncreaseCoverageDummyTest.java
-
-```java
-package de.schneider21.what2eat.meal.business;
-
-import org.junit.jupiter.api.Test;
-
-/**
- * This is an example how one can increase test coverage drastically without any actual benefit since the test is
- * useless (no assert used, and the weather service even logs an error!)
- */
-public class IncreaseCoverageDummyTest {
-
-    @Test
-    public void test() {
-        new MensaKlService().getAllAvailableMeals();
-        new WeatherBitService().getTemperatureInCelsius(null, null, null);
-    }
-}
-
-```
-
----
-
-## prompts/what2eat/context-code/what2eat/src/test/java/de/schneider21/what2eat/meal/business/MensaKlServiceTest.java
-
-**Path:** test/java/de/schneider21/what2eat/meal/business/MensaKlServiceTest.java
-
-```java
+```python
 package de.schneider21.what2eat.meal.business;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -1390,5 +1228,42 @@ public class MensaKlServiceTest {
 }
 ```
 
----
+## `src/test/java/de/schneider21/what2eat/meal/business/MockMenuService.java`
+
+```python
+package de.schneider21.what2eat.meal.business;
+
+import de.schneider21.what2eat.meal.data.BasicMeal;
+
+import java.util.Collections;
+import java.util.List;
+
+public class MockMenuService implements IMenuService {
+
+    private List<BasicMeal> allMeals;
+
+    public MockMenuService(List<BasicMeal> allMeals) {
+        this.allMeals = allMeals;
+    }
+
+    public List<BasicMeal> findAllSortByDateAsc() {
+        return Collections.unmodifiableList(allMeals);
+    }
+
+    @Override
+    public List<BasicMeal> getAllAvailableMeals() {
+        return allMeals;
+    }
+
+    @Override
+    public BasicMeal getMealForDate(String dateString) {
+        return allMeals
+                .stream()
+                .filter(m -> m.getDate().equals(dateString))
+                .findAny()
+                .orElse(null);
+    }
+}
+
+```
 
