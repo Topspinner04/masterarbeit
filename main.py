@@ -77,6 +77,9 @@ def edit_file_tool(path: str, old_str: str, new_str: str) -> Dict[str, Any]:
     new_path = generated_path / path
 
     if old_str == "":
+        new_path.parent.mkdir(
+            parents=True, exist_ok=True
+        )  # creates the parent directories if they don't exist
         new_path.write_text(new_str, encoding="utf-8")
         return {"path": str(new_path), "action": "created_file"}
     original = full_path.read_text(encoding="utf-8")
