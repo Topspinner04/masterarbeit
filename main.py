@@ -19,8 +19,11 @@ logfire.instrument_pydantic_ai()
 # Load system prompt
 system_prompt = load_prompt("prompts/system.md")
 
-# Load user prompt from project
-user_prompt = load_prompt(f"{PROMPT_PATH}/user.md")
+# Load user prompt from project.
+# TODO it is no longer necessary to parse file contents to the Agent via the user prompt, as tools are implemented.
+# We only need a task now with relevant to be tested context information.
+
+# user_prompt = load_prompt(f"{PROMPT_PATH}/user.md")
 user_prompt = "Create a HelloWorld.py file that prints 'HelloWorld'."
 
 agent = Agent(
