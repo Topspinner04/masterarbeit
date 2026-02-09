@@ -1,3 +1,3 @@
 ```text
-Implement the caching concept found in the documentation into the project.
+Implement a caching concept into the project.
 ```

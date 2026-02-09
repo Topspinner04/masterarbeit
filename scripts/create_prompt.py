@@ -18,7 +18,6 @@ build_prompt(
     output_file=f"{PROMPT_PATH}/context.md",
 )
 
-
 # Build user prompt from task and context prompt
 build_prompt(
     context_paths=[

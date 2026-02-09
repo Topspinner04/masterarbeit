@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any, Dict
 from pydantic_ai import Agent
 from dotenv import load_dotenv
-from config import PROMPT_PATH, REF_PATH
+from config import GENERATED_PATH, PROMPT_PATH, REF_PATH
 from utils.utils import load_prompt
 
 import logfire
@@ -16,10 +16,8 @@ logfire.configure()
 logfire.instrument_pydantic_ai()
 
 # Load system prompt
+# TODO optimize system prompt for tool use
 system_prompt = load_prompt("prompts/system.md")
-
-# Load user prompt from project.
-user_prompt = load_prompt(f"{PROMPT_PATH}/user.md")
 
 agent = Agent(
     "google-gla:gemini-2.5-pro",
@@ -36,7 +34,7 @@ def read_file_tool(filename: str) -> Dict[str, Any]:
     """
     project_path = Path(
         REF_PATH
-    ).resolve()  # Only let the agent read, create and modify files within the ref/"project" directory
+    ).resolve()  # Only let the agent read files within the ref directory
     full_path = (project_path / filename).resolve()
     print(full_path)
     with open(str(full_path), "r") as f:
@@ -53,7 +51,7 @@ def list_files_tool(path: str) -> Dict[str, Any]:
     """
     project_path = Path(
         REF_PATH
-    ).resolve()  # Only let the agent read, create and modify files within the ref/"project" directory
+    ).resolve()  # Only let the agent list files within the ref directory
     full_path = (project_path / path).resolve()
     all_files = []
     for item in full_path.iterdir():
@@ -73,21 +71,34 @@ def edit_file_tool(path: str, old_str: str, new_str: str) -> Dict[str, Any]:
     :param new_str: The string to replace with.
     :return: A dictionary with the path to the file and the action taken.
     """
-    project_path = Path(
-        REF_PATH
-    ).resolve()  # Only let the agent read, create and modify files within the ref/"project" directory
-    full_path = (project_path / path).resolve()
+    # Only let the agent read files within the ref directory
+    project_path = Path(REF_PATH).resolve()
+    full_path = project_path / path
+
+    # Only let the agent store created and modified files within the generated directory
+    generated_path = Path(GENERATED_PATH).resolve()
+    new_path = generated_path / path
+
     if old_str == "":
-        full_path.write_text(new_str, encoding="utf-8")
-        return {"path": str(full_path), "action": "created_file"}
+        new_path.write_text(new_str, encoding="utf-8")
+        return {"path": str(new_path), "action": "created_file"}
     original = full_path.read_text(encoding="utf-8")
     if original.find(old_str) == -1:
         return {"path": str(full_path), "action": "old_str not found"}
     edited = original.replace(old_str, new_str, 1)
-    full_path.write_text(edited, encoding="utf-8")
-    return {"path": str(full_path), "action": "edited"}
+    new_path.write_text(edited, encoding="utf-8")
+    return {"path": str(new_path), "action": "edited"}
 
 
-result = agent.run_sync(user_prompt)
+def main():
+    # Load user prompt from project.
+    # TODO optimize user/task prompt for tool use
+    user_prompt = load_prompt(f"{PROMPT_PATH}/user.md")
 
-print(result.output)
+    result = agent.run_sync(user_prompt)
+
+    print(result.output)
+
+
+if __name__ == "__main__":
+    main()
