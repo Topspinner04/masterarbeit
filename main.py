@@ -27,8 +27,7 @@ agent = Agent(
 
 @agent.tool_plain
 def read_file_tool(filename: str) -> Dict[str, Any]:
-    """
-    Gets the full content of a file provided by the user.
+    """Gets the full content of a file provided by the user.
     :param filename: The name of the file to read.
     :return: The full content of the file.
     """
@@ -44,8 +43,7 @@ def read_file_tool(filename: str) -> Dict[str, Any]:
 
 @agent.tool_plain
 def list_files_tool(path: str) -> Dict[str, Any]:
-    """
-    Lists the files in a directory provided by the user.
+    """Lists the files in a directory provided by the user.
     :param path: The path to a directory to list files from.
     :return: A list of files in the directory.
     """
@@ -63,8 +61,7 @@ def list_files_tool(path: str) -> Dict[str, Any]:
 
 @agent.tool_plain
 def edit_file_tool(path: str, old_str: str, new_str: str) -> Dict[str, Any]:
-    """
-    Replaces first occurrence of old_str with new_str in file. If old_str is empty,
+    """Replaces first occurrence of old_str with new_str in file. If old_str is empty,
     create/overwrite file with new_str.
     :param path: The path to the file to edit.
     :param old_str: The string to replace.
