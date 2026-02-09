@@ -1,7 +1,9 @@
+from pathlib import Path
 from typing import Any, Dict
 import logfire
 from pydantic_ai import Agent
 from dotenv import load_dotenv
+from config import PROMPT_PATH, REF_PATH
 from utils.utils import (
     load_prompt,
     resolve_abs_path,
@@ -17,12 +19,10 @@ logfire.instrument_pydantic_ai()
 # Load system prompt
 system_prompt = load_prompt("prompts/system.md")
 
-# Load user prompt TODO create config to store global variables like project name and paths
-project = "what2eat"
-prompt_path = f"prompts/{project}"
-user_prompt = load_prompt(f"{prompt_path}/user.md")
+# Load user prompt from project
+user_prompt = load_prompt(f"{PROMPT_PATH}/user.md")
+user_prompt = "Create a HelloWorld.py file that prints 'HelloWorld'."
 
-user_prompt = "Read one file in the ref/what2eat folder"
 agent = Agent(
     "google-gla:gemini-2.5-pro",
     instructions=system_prompt,
@@ -69,7 +69,10 @@ def edit_file_tool(path: str, old_str: str, new_str: str) -> Dict[str, Any]:
     :param new_str: The string to replace with.
     :return: A dictionary with the path to the file and the action taken.
     """
-    full_path = resolve_abs_path(path)
+    project_path = Path(
+        REF_PATH
+    ).resolve()  # Only let the agent read, create and modify files within the ref/"project" directory
+    full_path = (project_path / path).resolve()
     if old_str == "":
         full_path.write_text(new_str, encoding="utf-8")
         return {"path": str(full_path), "action": "created_file"}
