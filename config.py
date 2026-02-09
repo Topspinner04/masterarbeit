@@ -1,0 +1,4 @@
+PROJECT = "what2eat"
+REF_PATH = f"ref/{PROJECT}"
+CONTEXT_PATH = f"context/{PROJECT}"
+PROMPT_PATH = f"prompts/{PROJECT}"
