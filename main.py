@@ -1,13 +1,12 @@
 from pathlib import Path
 from typing import Any, Dict
-import logfire
 from pydantic_ai import Agent
 from dotenv import load_dotenv
-from config import PROMPT_PATH, REF_PATH
-from utils.utils import (
-    load_prompt,
-    resolve_abs_path,
-)
+from config import REF_PATH
+from utils.utils import load_prompt
+
+import logfire
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -39,7 +38,10 @@ def read_file_tool(filename: str) -> Dict[str, Any]:
     :param filename: The name of the file to read.
     :return: The full content of the file.
     """
-    full_path = resolve_abs_path(filename)
+    project_path = Path(
+        REF_PATH
+    ).resolve()  # Only let the agent read, create and modify files within the ref/"project" directory
+    full_path = (project_path / filename).resolve()
     print(full_path)
     with open(str(full_path), "r") as f:
         content = f.read()
@@ -53,7 +55,10 @@ def list_files_tool(path: str) -> Dict[str, Any]:
     :param path: The path to a directory to list files from.
     :return: A list of files in the directory.
     """
-    full_path = resolve_abs_path(path)
+    project_path = Path(
+        REF_PATH
+    ).resolve()  # Only let the agent read, create and modify files within the ref/"project" directory
+    full_path = (project_path / path).resolve()
     all_files = []
     for item in full_path.iterdir():
         all_files.append(
