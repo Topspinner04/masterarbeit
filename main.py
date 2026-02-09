@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any, Dict
 from pydantic_ai import Agent
 from dotenv import load_dotenv
-from config import REF_PATH
+from config import PROMPT_PATH, REF_PATH
 from utils.utils import load_prompt
 
 import logfire
@@ -19,11 +19,7 @@ logfire.instrument_pydantic_ai()
 system_prompt = load_prompt("prompts/system.md")
 
 # Load user prompt from project.
-# TODO it is no longer necessary to parse file contents to the Agent via the user prompt, as tools are implemented.
-# We only need a task now with relevant to be tested context information.
-
-# user_prompt = load_prompt(f"{PROMPT_PATH}/user.md")
-user_prompt = "Create a HelloWorld.py file that prints 'HelloWorld'."
+user_prompt = load_prompt(f"{PROMPT_PATH}/user.md")
 
 agent = Agent(
     "google-gla:gemini-2.5-pro",
