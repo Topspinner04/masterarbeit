@@ -22,6 +22,7 @@ project = "what2eat"
 prompt_path = f"prompts/{project}"
 user_prompt = load_prompt(f"{prompt_path}/user.md")
 
+user_prompt = "Read one file in the ref/what2eat folder"
 agent = Agent(
     "google-gla:gemini-2.5-pro",
     instructions=system_prompt,
