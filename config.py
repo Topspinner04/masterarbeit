@@ -1,5 +1,6 @@
 PROJECT = "what2eat"
+TREATMENT = "treatment_a"  # or "treatment_b"
 REF_PATH = f"ref/{PROJECT}"
-GENERATED_PATH = f"generated/{PROJECT}"
+GENERATED_PATH = f"generated/{PROJECT}/{TREATMENT}"
 CONTEXT_PATH = f"context/{PROJECT}"
-PROMPT_PATH = f"prompts/{PROJECT}"
+PROMPT_PATH = f"prompts/{PROJECT}/{TREATMENT}"
