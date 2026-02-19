@@ -24,7 +24,9 @@ def build_prompt(context_paths, output_file):
     """Combine prompt parts into single prompt."""
     combined_prompt = []
     for path in context_paths:
-        combined_prompt.append(load_prompt(path))
+        content = load_prompt(path)
+        if content.strip():
+            combined_prompt.append(content)
 
     with open(output_file, "w") as out:
         out.write("\n".join(combined_prompt))
