@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Any, Dict
 from pydantic_ai import Agent
+from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.openai import OpenAIProvider
 from dotenv import load_dotenv
 from config import GENERATED_PATH, PROMPT_PATH, REF_PATH
 from utils.utils import load_prompt
@@ -19,7 +21,17 @@ logfire.instrument_pydantic_ai()
 # TODO optimize system prompt for tool use
 system_prompt = load_prompt("prompts/system.md")
 
-agent = Agent(
+# Local Qwen3 Coder
+model = OpenAIChatModel(
+    model_name='llm',
+    provider=OpenAIProvider(
+        base_url='https://blackwell.iese.de/qwen_3_coder_480b_a35b_instruct/v1', api_key='sk-vllm'
+    ),
+)
+agent = Agent(model)
+
+# Cloud Gemini AI 
+agent_cloud = Agent(
     "google-gla:gemini-2.5-pro",
     instructions=system_prompt,
 )
