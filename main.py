@@ -44,21 +44,24 @@ system_prompt = load_prompt("prompts/system.md")
 
 # Local Qwen3 Coder
 model = OpenAIChatModel(
-    model_name='llm',
+    model_name="llm",
     provider=OpenAIProvider(
-        base_url='https://blackwell.iese.de/qwen_3_coder_480b_a35b_instruct/v1', api_key='sk-vllm'
+        base_url="https://blackwell.iese.de/qwen_3_coder_480b_a35b_instruct/v1",
+        api_key="sk-vllm",
     ),
 )
-agent = Agent(model=model,instructions=system_prompt,
-              tools=[
-                rag_tool.perform_rag_search,
-                read_file_tool,
-                list_files_tool,
-                edit_file_tool,
-              ]
-    )
+agent = Agent(
+    model=model,
+    instructions=system_prompt,
+    tools=[
+        rag_tool.perform_rag_search,
+        read_file_tool,
+        list_files_tool,
+        edit_file_tool,
+    ],
+)
 
-# Cloud Gemini AI 
+# Cloud Gemini AI
 agent_cloud = Agent(
     model="google-gla:gemini-2.5-pro",
     instructions=system_prompt,
