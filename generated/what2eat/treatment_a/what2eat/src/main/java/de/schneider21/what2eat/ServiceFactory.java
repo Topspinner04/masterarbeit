@@ -1,6 +1,8 @@
 package de.schneider21.what2eat;
 
 import de.schneider21.what2eat.meal.business.*;
+import de.schneider21.what2eat.meal.caching.MenuServiceCachingDecorator;
+import de.schneider21.what2eat.meal.caching.WeatherServiceCachingDecorator;
 
 /**
  * Service Factory. Central entry point for getting the service implementations.
@@ -27,10 +29,9 @@ public class ServiceFactory {
     private IWeatherService weatherService;
 
     private ServiceFactory() {
-        menuService = new MensaKlService();
-        weatherService = new WeatherBitService();
-        IMealService mealServiceToCache = new MealService(menuService, weatherService);
-        mealService = new MealServiceCached(mealServiceToCache);
+        menuService = new MenuServiceCachingDecorator(new MensaKlService());
+        weatherService = new WeatherServiceCachingDecorator(new WeatherBitService());
+        mealService = new MealService(menuService, weatherService);
     }
 
 

@@ -1,14 +1,17 @@
-from pathlib import Path
-from typing import Any, Dict
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from dotenv import load_dotenv
-from config import GENERATED_PATH, PROMPT_PATH, REF_PATH
+from config import PROMPT_PATH, REF_PATH
+from rag.retriever import Retriever
+from rag.chunk import Chunker
+from rag.embedder import Embedder
+from rag.rag_tool import RAGTool
+from rag.vector_store import VectorStore
 from utils.utils import load_prompt
+from tools.tools import read_file_tool, list_files_tool, edit_file_tool
 
 import logfire
-
 
 # Load environment variables from .env file
 load_dotenv()
@@ -17,8 +20,26 @@ load_dotenv()
 logfire.configure()
 logfire.instrument_pydantic_ai()
 
+# Load and chunk architecture documentation
+with open(f"{REF_PATH}/docs/architecture.md", "r", encoding="utf-8") as f:
+    doc = f.read()
+
+chunker = Chunker()
+docs = chunker.chunk(doc)
+
+# Embedd chunks
+embedder = Embedder()
+embeddings = embedder.embed([doc.content for doc in docs])
+
+# Add embeddings and corresponding chunks to vector store
+vector_store = VectorStore(dim=embeddings.shape[1])
+vector_store.add(embeddings, docs)
+
+# Create retriever and RAG tool
+retriever = Retriever(embedder, vector_store)
+rag_tool = RAGTool(retriever)
+
 # Load system prompt
-# TODO optimize system prompt for tool use
 system_prompt = load_prompt("prompts/system.md")
 
 # Local Qwen3 Coder
@@ -34,81 +55,21 @@ agent = Agent(model)
 agent_cloud = Agent(
     "google-gla:gemini-2.5-pro",
     instructions=system_prompt,
+    tools=[
+        rag_tool.perform_rag_search,
+        read_file_tool,
+        list_files_tool,
+        edit_file_tool,
+    ],
 )
 
 
-@agent.tool_plain
-def read_file_tool(filename: str) -> Dict[str, Any]:
-    """Gets the full content of a file provided by the user.
-    :param filename: The name of the file to read.
-    :return: The full content of the file.
-    """
-    project_path = Path(
-        REF_PATH
-    ).resolve()  # Only let the agent read files within the ref directory
-    full_path = (project_path / filename).resolve()
-    print(full_path)
-    with open(str(full_path), "r") as f:
-        content = f.read()
-    return {"file_path": str(full_path), "content": content}
-
-
-@agent.tool_plain
-def list_files_tool(path: str) -> Dict[str, Any]:
-    """Lists the files in a directory provided by the user.
-    :param path: The path to a directory to list files from.
-    :return: A list of files in the directory.
-    """
-    project_path = Path(
-        REF_PATH
-    ).resolve()  # Only let the agent list files within the ref directory
-    full_path = (project_path / path).resolve()
-    all_files = []
-    for item in full_path.iterdir():
-        all_files.append(
-            {"filename": item.name, "type": "file" if item.is_file() else "dir"}
-        )
-    return {"path": str(full_path), "files": all_files}
-
-
-@agent.tool_plain
-def edit_file_tool(path: str, old_str: str, new_str: str) -> Dict[str, Any]:
-    """Replaces first occurrence of old_str with new_str in file. If old_str is empty,
-    create/overwrite file with new_str.
-    :param path: The path to the file to edit.
-    :param old_str: The string to replace.
-    :param new_str: The string to replace with.
-    :return: A dictionary with the path to the file and the action taken.
-    """
-    # Only let the agent read files within the ref directory
-    project_path = Path(REF_PATH).resolve()
-    full_path = project_path / path
-
-    # Only let the agent store created and modified files within the generated directory
-    generated_path = Path(GENERATED_PATH).resolve()
-    new_path = generated_path / path
-
-    if old_str == "":
-        new_path.parent.mkdir(
-            parents=True, exist_ok=True
-        )  # creates the parent directories if they don't exist
-        new_path.write_text(new_str, encoding="utf-8")
-        return {"path": str(new_path), "action": "created_file"}
-    original = full_path.read_text(encoding="utf-8")
-    if original.find(old_str) == -1:
-        return {"path": str(full_path), "action": "old_str not found"}
-    edited = original.replace(old_str, new_str, 1)
-    new_path.write_text(edited, encoding="utf-8")
-    return {"path": str(new_path), "action": "edited"}
-
-
 def main():
-    # Load user prompt from project.
-    # TODO optimize user/task prompt for tool use
+    # Load user prompt from project
     user_prompt = load_prompt(f"{PROMPT_PATH}/user.md")
 
+    # Rund agent and print results
     result = agent.run_sync(user_prompt)
-
     print(result.output)
 
 
