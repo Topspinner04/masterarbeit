@@ -49,11 +49,18 @@ model = OpenAIChatModel(
         base_url='https://blackwell.iese.de/qwen_3_coder_480b_a35b_instruct/v1', api_key='sk-vllm'
     ),
 )
-agent = Agent(model)
+agent = Agent(model=model,instructions=system_prompt,
+              tools=[
+                rag_tool.perform_rag_search,
+                read_file_tool,
+                list_files_tool,
+                edit_file_tool,
+              ]
+    )
 
 # Cloud Gemini AI 
 agent_cloud = Agent(
-    "google-gla:gemini-2.5-pro",
+    model="google-gla:gemini-2.5-pro",
     instructions=system_prompt,
     tools=[
         rag_tool.perform_rag_search,
