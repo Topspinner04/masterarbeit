@@ -2,7 +2,7 @@ from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from dotenv import load_dotenv
-from config import PROMPT_PATH, REF_PATH
+from config import CONTEXT_PATH, PROMPT_PATH, TREATMENT
 from rag.retriever import Retriever
 from rag.chunk import Chunker
 from rag.embedder import Embedder
@@ -21,7 +21,7 @@ logfire.configure()
 logfire.instrument_pydantic_ai()
 
 # Load and chunk architecture documentation
-with open(f"{REF_PATH}/docs/architecture.md", "r", encoding="utf-8") as f:
+with open(f"{CONTEXT_PATH}/architecture.md", "r", encoding="utf-8") as f:
     doc = f.read()
 
 chunker = Chunker()
@@ -54,6 +54,16 @@ agent = Agent(
     model=model,
     instructions=system_prompt,
     tools=[
+        read_file_tool,
+        list_files_tool,
+        edit_file_tool,
+    ],
+)
+
+agent_RAG = Agent(
+    model=model,
+    instructions=system_prompt,
+    tools=[
         rag_tool.perform_rag_search,
         read_file_tool,
         list_files_tool,
@@ -79,7 +89,13 @@ def main():
     user_prompt = load_prompt(f"{PROMPT_PATH}/user.md")
 
     # Rund agent and print results
-    result = agent.run_sync(user_prompt)
+    if TREATMENT == "treatment_a" or "treatment_b": # these do not use RAG
+        print(f"Performing {TREATMENT}...")
+        result = agent.run_sync(user_prompt)
+    else: 
+        print(f"Performing {TREATMENT}...")
+        result = agent_RAG.run_sync(user_prompt)
+
     print(result.output)
 
 
