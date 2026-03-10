@@ -1,0 +1,4 @@
+[submodule "ref/what2eat"]
+	path = ref/what2eat
+	url = https://github.com/neshanjo/what2eat.git
+	branch = with-di
