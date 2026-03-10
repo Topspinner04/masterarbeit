@@ -2,7 +2,7 @@ from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from dotenv import load_dotenv
-from config import DOC_PATH, PROMPT_PATH
+from config import DOC_PATH, PROMPT_PATH, TREATMENT
 from rag.retriever import Retriever
 from rag.chunk import Chunker
 from rag.embedder import Embedder
@@ -88,11 +88,13 @@ def main():
     # Load user prompt from project
     user_prompt = load_prompt(f"{PROMPT_PATH}/user.md")
 
-    # Rund agent and print results
-    if TREATMENT == "treatment_a" or "treatment_b": # these do not use RAG
+    # Run agent and print results
+    if (
+        TREATMENT == "treatment_a" or "treatment_b"
+    ):  # these do not use RAG. a with no context, b with full context in prompt
         print(f"Performing {TREATMENT}...")
         result = agent.run_sync(user_prompt)
-    else: 
+    else:
         print(f"Performing {TREATMENT}...")
         result = agent_RAG.run_sync(user_prompt)
 
