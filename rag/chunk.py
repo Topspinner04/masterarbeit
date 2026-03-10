@@ -1,4 +1,3 @@
-import re
 from typing import List
 from .document import Document
 
@@ -7,26 +6,19 @@ class Chunker:
     def __init__(self) -> None:
         pass
 
-    def chunk(self, document: str) -> List[Document]:
-        # Split on any markdown heading (# to ######)
-        pattern = r"(?m)^(#{1,6}) (.+)$"
-        matches = list(re.finditer(pattern, document))
-
+    def chunk(self, document: str, chunk_size=1024, overlap=128) -> List[Document]:
         docs = []
-        for i, match in enumerate(matches):
-            heading_text = match.group(2).strip()
+        start = 0
 
-            # Determine the end: start of next heading or end of document
-            end = matches[i + 1].start() if i + 1 < len(matches) else len(document)
-            content = document[
-                match.start() : end
-            ].strip()  # include heading in content
-
+        while start < len(document):
+            end = start + chunk_size
+            content = document[start:end]
             docs.append(
                 Document(
                     content=content,
-                    metadata={"heading": heading_text},
+                    metadata={"start_char": start, "end_char": min(end, len(document))},
                 )
             )
+            start += chunk_size - overlap
 
         return docs

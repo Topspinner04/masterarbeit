@@ -10,7 +10,7 @@ class RAGTool:
         docs = self.retriever.retrieve(query)
 
         context = "\n\n".join(
-            f"[Source {i + 1} ({doc.metadata['heading']})]\n{doc.content}"
+            f"[Source {i + 1} (Characters {doc.metadata['start_char']} - {doc.metadata['end_char']})]\n{doc.content}"
             for i, doc in enumerate(docs)
         )
 
