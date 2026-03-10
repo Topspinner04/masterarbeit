@@ -27,6 +27,14 @@ def list_files_tool(path: str) -> Dict[str, Any]:
         REF_PATH
     ).resolve()  # Only let the agent list files within the ref directory
     full_path = (project_path / path).resolve()
+
+    if not full_path.exists():
+        return {"path": str(full_path), "error": "path_not_found", "files": []}
+
+    # Fallback if path is not a directory
+    if not full_path.is_dir():
+        return {"path": str(full_path), "error": "not_a_directory", "files": []}
+
     all_files = []
     for item in full_path.iterdir():
         all_files.append(
@@ -45,21 +53,30 @@ def edit_file_tool(path: str, old_str: str, new_str: str) -> Dict[str, Any]:
     """
     # Only let the agent read files within the ref directory
     project_path = Path(REF_PATH).resolve()
-    full_path = project_path / path
-
-    # Only let the agent store created and modified files within the generated directory
     generated_path = Path(GENERATED_PATH).resolve()
-    new_path = generated_path / path
+    ref_file = project_path / path
+    gen_file = generated_path / path
 
+    # case new file
     if old_str == "":
-        new_path.parent.mkdir(
+        gen_file.parent.mkdir(
             parents=True, exist_ok=True
         )  # creates the parent directories if they don't exist
-        new_path.write_text(new_str, encoding="utf-8")
-        return {"path": str(new_path), "action": "created_file"}
-    original = full_path.read_text(encoding="utf-8")
+        gen_file.write_text(new_str, encoding="utf-8")
+        return {"path": str(gen_file), "action": "created_file"}
+
+    # case edit file
+    # edit the already generated file if it exists
+    f = gen_file if gen_file.exists() else ref_file
+
+    if not f.exists():
+        return {"path": str(f), "action": "file_not_found"}
+
+    original = f.read_text(encoding="utf-8")
+
     if original.find(old_str) == -1:
-        return {"path": str(full_path), "action": "old_str not found"}
+        return {"path": str(f), "action": "old_str not found"}
+
     edited = original.replace(old_str, new_str, 1)
-    new_path.write_text(edited, encoding="utf-8")
-    return {"path": str(new_path), "action": "edited"}
+    gen_file.write_text(edited, encoding="utf-8")
+    return {"path": str(gen_file), "action": "edited"}
