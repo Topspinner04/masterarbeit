@@ -6,13 +6,9 @@ Follow these steps to generate and run tasks for a project and specified treatme
    Set project and treatment in `config.py`.
 
 2. **Edit the context and task prompt**  
-   Update `task.md` and `context.md` and review the context information in `ref/<project>/docs`.
+   Update `user.md` and review the context information in `ref/<project>/docs`.
 
-3. **Generate the user prompt**  
-   Run: `python -m scripts/create_prompt`  
-   This combines the context and task prompt into a single user prompt for the specified treatment.
-
-4. **Run the coding agent**  
+. **Run the coding agent**  
    Execute: `python main.py`
 
 5. **Review generated output**  
