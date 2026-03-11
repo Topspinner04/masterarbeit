@@ -1,5 +1,5 @@
 PROJECT = "what2eat"
-TREATMENT = "treatment_b"  # or "treatment_b" or "treatment_c"
+TREATMENT = "treatment_c"  # or "treatment_b" or "treatment_c"
 REF_PATH = f"ref/{PROJECT}"
 DOC_PATH = f"doc/{PROJECT}"
 GEN_PATH = f"generated/{PROJECT}/{TREATMENT}"

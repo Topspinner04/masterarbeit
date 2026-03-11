@@ -45,9 +45,6 @@ def resolve_abs_path(path_str: str) -> Path:
     if not path.is_absolute():
         path = (Path.cwd() / path).resolve()
     return path
-import shutil
-import subprocess
-from pathlib import Path
 
 def copy_submodule_and_reset(repo_root, submodule_path, destination):
     repo_root = Path(repo_root).resolve()
@@ -63,18 +60,19 @@ def copy_submodule_and_reset(repo_root, submodule_path, destination):
 
     # Copy submodule contents
     shutil.copytree(submodule, destination, dirs_exist_ok=True)
+    print(f"Copied {submodule} -> {destination}")
 
     # Reset changes inside the submodule
     subprocess.run(
         ["git", "-C", str(submodule), "reset", "--hard"],
         check=True
     )
+    print(f"Reset submodule {submodule}")
 
     # Remove untracked files
     subprocess.run(
         ["git", "-C", str(submodule), "clean", "-fd"],
         check=True
     )
-
-    print(f"Copied {submodule} -> {destination} and reset submodule.")
+    print(f"Removed untracked files in submodule {submodule}")
 

@@ -40,7 +40,7 @@ retriever = Retriever(embedder, vector_store)
 rag_tool = RAGTool(retriever)
 
 # Load system prompt
-system_prompt = load_prompt("prompts/system.md")
+system_prompt = load_prompt(f"{PROMPT_PATH}/system.md")
 
 # Local Qwen3 Coder
 model = OpenAIChatModel(
@@ -60,7 +60,7 @@ agent = Agent(
     ],
 )
 
-agent_RAG = Agent(
+rag_agent = Agent(
     model=model,
     instructions=system_prompt,
     tools=[
@@ -89,14 +89,12 @@ def main():
     user_prompt = load_prompt(f"{PROMPT_PATH}/user.md")
 
     # Run agent and print results
-    if (
-        TREATMENT == "treatment_a" or "treatment_b"
-    ):  # these do not use RAG. a with no context, b with full context in prompt
-        print(f"Performing {TREATMENT}...")
+    if TREATMENT in ["treatment_a", "treatment_b"]:  # these do not use RAG. a with no context, b with full context in prompt
+        print(f"Performing treatment with agent...")
         result = agent.run_sync(user_prompt)
     else:
-        print(f"Performing {TREATMENT}...")
-        result = agent_RAG.run_sync(user_prompt)
+        print(f"Performing treatment with rag_agent...")
+        result = rag_agent.run_sync(user_prompt)
 
     print(result.output)
     # Copies edited files to gen/ and resets ref/ to baseline
