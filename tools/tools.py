@@ -1,21 +1,19 @@
 from pathlib import Path
 from typing import Any, Dict
-from config import GENERATED_PATH, REF_PATH
+from config import GEN_PATH, REF_PATH
 
 
-def read_file_tool(filename: str) -> Dict[str, Any]:
+def read_file_tool(path: str) -> Dict[str, Any]:
     """Gets the full content of a file provided by the user.
-    :param filename: The name of the file to read.
+    :param path: The path to the file to read.
     :return: The full content of the file.
     """
-    project_path = Path(
-        REF_PATH
-    ).resolve()  # Only let the agent read files within the ref directory
-    full_path = (project_path / filename).resolve()
-    print(full_path)
-    with open(str(full_path), "r") as f:
+    ref_root = Path(REF_PATH).resolve()
+    ref_path = ref_root / path
+
+    with open(str(ref_path), "r") as f:
         content = f.read()
-    return {"file_path": str(full_path), "content": content}
+    return {"file_path": str(ref_path), "content": content}
 
 
 def list_files_tool(path: str) -> Dict[str, Any]:
@@ -23,24 +21,22 @@ def list_files_tool(path: str) -> Dict[str, Any]:
     :param path: The path to a directory to list files from.
     :return: A list of files in the directory.
     """
-    project_path = Path(
-        REF_PATH
-    ).resolve()  # Only let the agent list files within the ref directory
-    full_path = (project_path / path).resolve()
+    ref_root = Path(REF_PATH).resolve()
+    ref_path = ref_root / path
 
-    if not full_path.exists():
-        return {"path": str(full_path), "error": "path_not_found", "files": []}
+    if not ref_path.exists():
+        return {"path": str(ref_path), "error": "path_not_found", "files": []}
 
     # Fallback if path is not a directory
-    if not full_path.is_dir():
-        return {"path": str(full_path), "error": "not_a_directory", "files": []}
+    if not ref_path.is_dir():
+        return {"path": str(ref_path), "error": "not_a_directory", "files": []}
 
     all_files = []
-    for item in full_path.iterdir():
+    for item in ref_path.iterdir():
         all_files.append(
             {"filename": item.name, "type": "file" if item.is_file() else "dir"}
         )
-    return {"path": str(full_path), "files": all_files}
+    return {"path": str(ref_path), "files": all_files}
 
 
 def edit_file_tool(path: str, old_str: str, new_str: str) -> Dict[str, Any]:
@@ -52,31 +48,27 @@ def edit_file_tool(path: str, old_str: str, new_str: str) -> Dict[str, Any]:
     :return: A dictionary with the path to the file and the action taken.
     """
     # Only let the agent read files within the ref directory
-    project_path = Path(REF_PATH).resolve()
-    generated_path = Path(GENERATED_PATH).resolve()
-    ref_file = project_path / path
-    gen_file = generated_path / path
+    ref_root = Path(REF_PATH).resolve()
+    ref_file = ref_root / path
 
     # case new file
     if old_str == "":
-        gen_file.parent.mkdir(
+        ref_file.parent.mkdir(
             parents=True, exist_ok=True
         )  # creates the parent directories if they don't exist
-        gen_file.write_text(new_str, encoding="utf-8")
-        return {"path": str(gen_file), "action": "created_file"}
+        ref_file.write_text(new_str, encoding="utf-8")
+        return {"path": str(ref_file), "action": "created_file"}
 
     # case edit file
-    # edit the already generated file if it exists
-    f = gen_file if gen_file.exists() else ref_file
+    if not ref_file.exists():
+        return {"path": str(ref_file), "action": "file_not_found"}
 
-    if not f.exists():
-        return {"path": str(f), "action": "file_not_found"}
+    content = ref_file.read_text(encoding="utf-8")
 
-    original = f.read_text(encoding="utf-8")
+    if content.find(old_str) == -1:
+        return {"path": str(content), "action": "str_not_found"}
 
-    if original.find(old_str) == -1:
-        return {"path": str(f), "action": "old_str not found"}
-
-    edited = original.replace(old_str, new_str, 1)
-    gen_file.write_text(edited, encoding="utf-8")
-    return {"path": str(gen_file), "action": "edited"}
+    edited_content = content.replace(old_str, new_str, 1)
+    ref_file.parent.mkdir(parents=True, exist_ok=True)
+    ref_file.write_text(edited_content, encoding="utf-8")
+    return {"path": str(ref_file), "action": "edited_file"}

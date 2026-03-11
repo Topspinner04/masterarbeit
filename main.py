@@ -2,13 +2,13 @@ from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from dotenv import load_dotenv
-from config import DOC_PATH, PROMPT_PATH, TREATMENT
+from config import DOC_PATH, GEN_PATH, PROMPT_PATH, REF_PATH, TREATMENT
 from rag.retriever import Retriever
 from rag.chunk import Chunker
 from rag.embedder import Embedder
 from rag.rag_tool import RAGTool
 from rag.vector_store import VectorStore
-from utils.utils import load_prompt
+from utils.utils import copy_submodule_and_reset, load_prompt
 from tools.tools import read_file_tool, list_files_tool, edit_file_tool
 
 import logfire
@@ -72,16 +72,16 @@ agent_RAG = Agent(
 )
 
 # Cloud Gemini AI
-agent_cloud = Agent(
-    model="google-gla:gemini-3.1-pro-preview",
-    instructions=system_prompt,
-    tools=[
-        rag_tool.perform_rag_search,
-        read_file_tool,
-        list_files_tool,
-        edit_file_tool,
-    ],
-)
+# agent_cloud = Agent(
+#     model="google-gla:gemini-3.1-pro-preview",
+#     instructions=system_prompt,
+#     tools=[
+#         rag_tool.perform_rag_search,
+#         read_file_tool,
+#         list_files_tool,
+#         edit_file_tool,
+#     ],
+# )
 
 
 def main():
@@ -99,6 +99,8 @@ def main():
         result = agent_RAG.run_sync(user_prompt)
 
     print(result.output)
+    # Copies edited files to gen/ and resets ref/ to baseline
+    copy_submodule_and_reset(".", REF_PATH, GEN_PATH)
 
 
 if __name__ == "__main__":

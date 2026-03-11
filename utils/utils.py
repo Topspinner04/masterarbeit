@@ -1,4 +1,7 @@
+import shutil
+import subprocess
 from pathlib import Path
+
 
 
 def load_prompt(file_path):
@@ -42,3 +45,36 @@ def resolve_abs_path(path_str: str) -> Path:
     if not path.is_absolute():
         path = (Path.cwd() / path).resolve()
     return path
+import shutil
+import subprocess
+from pathlib import Path
+
+def copy_submodule_and_reset(repo_root, submodule_path, destination):
+    repo_root = Path(repo_root).resolve()
+    submodule = repo_root / submodule_path
+    destination = Path(destination).resolve()
+
+    if not submodule.exists():
+        raise FileNotFoundError(f"Submodule path not found: {submodule}")
+
+    # Remove destination if it exists
+    if destination.exists():
+        shutil.rmtree(destination)
+
+    # Copy submodule contents
+    shutil.copytree(submodule, destination, dirs_exist_ok=True)
+
+    # Reset changes inside the submodule
+    subprocess.run(
+        ["git", "-C", str(submodule), "reset", "--hard"],
+        check=True
+    )
+
+    # Remove untracked files
+    subprocess.run(
+        ["git", "-C", str(submodule), "clean", "-fd"],
+        check=True
+    )
+
+    print(f"Copied {submodule} -> {destination} and reset submodule.")
+
