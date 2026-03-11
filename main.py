@@ -4,7 +4,6 @@ from pydantic_ai.providers.openai import OpenAIProvider
 from dotenv import load_dotenv
 from config import DOC_PATH, GEN_PATH, PROMPT_PATH, REF_PATH, TREATMENT
 from rag.retriever import Retriever
-from rag.chunk import Chunker
 from rag.embedder import Embedder
 from rag.rag_tool import RAGTool
 from rag.vector_store import VectorStore
@@ -20,23 +19,16 @@ load_dotenv()
 logfire.configure()
 logfire.instrument_pydantic_ai()
 
-# Load and chunk architecture documentation
-with open(f"{DOC_PATH}/architecture.md", "r", encoding="utf-8") as f:
-    doc = f.read()
+# Load existing index
+vector_store = VectorStore.load("rag/vector_store")
 
-chunker = Chunker()
-docs = chunker.chunk(doc)
-
-# Embedd chunks
+# Create embedder
 embedder = Embedder()
-embeddings = embedder.embed([doc.content for doc in docs])
 
-# Add embeddings and corresponding chunks to vector store
-vector_store = VectorStore(dim=embeddings.shape[1])
-vector_store.add(embeddings, docs)
-
-# Create retriever and RAG tool
+# Create retriever
 retriever = Retriever(embedder, vector_store)
+
+# Create RAG tool
 rag_tool = RAGTool(retriever)
 
 # Load system prompt
