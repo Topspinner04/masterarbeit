@@ -1,6 +1,7 @@
 PROJECT = "what2eat"
-TREATMENT = "treatment_b"  # or "treatment_b" or "treatment_c"
+TREATMENT = "treatment_d"  # or "treatment_b" or "treatment_c" or "treatment_d"
 REF_PATH = f"ref/{PROJECT}"
 DOC_PATH = f"doc/{PROJECT}"
 GEN_PATH = f"generated/{PROJECT}"
 PROMPT_PATH = f"prompts/{PROJECT}"
+MODEL = "Gemini"

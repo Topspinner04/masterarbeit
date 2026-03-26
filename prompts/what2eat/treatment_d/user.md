@@ -1,0 +1,1 @@
+Implement an in-memory cache such that meals and weather data is only queried every 30 minutes into the project.

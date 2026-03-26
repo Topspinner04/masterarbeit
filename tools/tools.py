@@ -9,8 +9,11 @@ def read_file_tool(path: str) -> Dict[str, Any]:
     :return: The full content of the file.
     """
     ref_root = Path(REF_PATH).resolve()
-    ref_path = ref_root / path
-
+    ref_path = ref_root / path.lstrip("/\\")
+    
+    if not ref_path.exists():
+            return {"path": str(ref_path), "error": "path_not_found", "files": []}
+    
     with open(str(ref_path), "r") as f:
         content = f.read()
     return {"file_path": str(ref_path), "content": content}
@@ -22,7 +25,7 @@ def list_files_tool(path: str) -> Dict[str, Any]:
     :return: A list of files in the directory.
     """
     ref_root = Path(REF_PATH).resolve()
-    ref_path = ref_root / path
+    ref_path = ref_root / path.lstrip("/\\")
 
     if not ref_path.exists():
         return {"path": str(ref_path), "error": "path_not_found", "files": []}

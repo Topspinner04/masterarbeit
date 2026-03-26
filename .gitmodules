@@ -2,3 +2,7 @@
 	path = ref/what2eat
 	url = https://github.com/neshanjo/what2eat.git
 	branch = with-di
+[submodule "ref/what2eat_initial"]
+	path = ref/what2eat_initial
+	url = https://github.com/neshanjo/what2eat.git
+	branch = initial
